@@ -8,18 +8,18 @@ import (
 func even(l1 []int, c chan int) {
 	sum := 0
 	for i, val := range l1 {
-		if i%2 == 0 {
+		if l1[i] % 2 == 0 {
 			sum += val
 		}
 	}
-	time.Sleep(1 * time.Millisecond)
+	time.Sleep(3 * time.Millisecond)
 	c <- sum
 }
 
 func odd(l2 []int, c chan int) {
 	sum := 0
 	for i, val := range l2 {
-		if i%2 != 0 {
+		if l2[i] % 2 != 0 {
 			sum += val
 		}
 	}
