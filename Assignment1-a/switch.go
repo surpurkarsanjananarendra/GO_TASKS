@@ -7,7 +7,7 @@ import (
 func even(l1 []int) int {
 	sum := 0
 	for i, val := range l1 {
-		if i%2 == 0 {
+		if l1[i] % 2 == 0 {
 			sum += val
 		}
 	}
@@ -17,7 +17,7 @@ func even(l1 []int) int {
 func odd(l2 []int) int {
 	sum := 0
 	for i, val := range l2 {
-		if i%2 != 0 {
+		if l2[i] % 2 != 0 {
 			sum += val
 		}
 	}
@@ -25,7 +25,7 @@ func odd(l2 []int) int {
 }
 
 func main() {
-	l := [6]int{2, 9, 3, 4, 10, 1}
+	l := [6]int{2, 9, 3, 4, 10, 15}
 
 	a := even(l[:])
 	b := odd(l[:])
