@@ -71,8 +71,9 @@ func main() {
 				} else {
 				fmt.Println("Error reading eid:", err)
 				}
-				}
+				}else{
 				fmt.Println("Successfully read Eid:", e.Eid)
+				}
 
 				fmt.Print("Enter Name: ")
 				_, err = fmt.Scan(&e.Name)
@@ -83,8 +84,9 @@ func main() {
 					}
 					fmt.Println("Error reading name:", err)
 					return
-				}
+				}else{
 				fmt.Println("Successfully read Name:", e.Name)
+				}
 
 				fmt.Print("Enter Age: ")
 				_, err = fmt.Scan(&e.Age)
@@ -95,8 +97,9 @@ func main() {
 					}
 					fmt.Println("Error reading Age:", err)
 					return
-				}
+				}else{
 				fmt.Println("Successfully read Age:", e.Age)
+				}
 
 				fmt.Print("Enter Salary: ")
 				_, err = fmt.Scan(&e.Salary)
@@ -107,8 +110,9 @@ func main() {
 					}
 					fmt.Println("Error reading Salary:", err)
 					return
-				}
+				}else{
 				fmt.Println("Successfully read Salary:", e.Salary)
+				}
 
 				fmt.Print("Enter Department: ")
 				_, err = fmt.Scan(&e.Dept)
@@ -119,8 +123,9 @@ func main() {
 					}
 					fmt.Println("Error reading Dept:", err)
 					return
-				}
+				}else{
 				fmt.Println("Successfully read Dept:", e.Dept)
+				}
 
 				lt = append(lt, e)
 
@@ -191,8 +196,7 @@ func main() {
 		case 4:
 			fmt.Println("\nALL EMPLOYEES")
 			for _, e := range lt {
-				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s",
-					e.Eid, e.Name, e.Age, e.Salary, e.Dept)
+				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s",e.Eid, e.Name, e.Age, e.Salary, e.Dept)
 			}
 
 			fmt.Println("\n\nFinance:", finance.List)
