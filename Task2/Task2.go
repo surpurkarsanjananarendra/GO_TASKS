@@ -20,7 +20,7 @@ func (d *Department) AddEmp(e Employees) {
 	d.List = append(d.List, e)
 }
 
-func (d *Department) RemoveEmp(id int) {
+func (d *Department) RemoveEmp(id int) {   //Need to implement using Delete or Remove functs
 	for i, emp := range d.List {
 		if emp.Eid == id {
 			d.List = append(d.List[:i], d.List[i+1:]...)
@@ -55,12 +55,12 @@ func main() {
 		fmt.Scan(&ch)
 
 		switch ch {
-		case 1:
+		case 1:              //Need to implement for repeated id
 			var n int
 			fmt.Print("Enter number of employees to add: ")
 			fmt.Scan(&n)
 
-			for i := 0; i < n; i++ {
+			for i := 0; i < n; i++ {  //Need to implement a singlr func to work for all scanlns
 				var e Employees
 
 				fmt.Print("\nEnter Eid: ")
@@ -146,13 +146,7 @@ func main() {
 			marketing.RemoveEmp(id)
 			it.RemoveEmp(id)
 
-			for i, emp := range lt {
-				if emp.Eid == id {
-					lt = append(lt[:i], lt[i+1:]...)
-					break
-				}
-			}
-		case 3:
+		case 3:        // Need to implement for non-existent id and repeated id
     	var id int
     	fmt.Print("Enter Employee ID to update: ")
     	fmt.Scan(&id)
@@ -212,9 +206,8 @@ func main() {
     	fmt.Print("Enter Raise Percentage: ")
     	fmt.Scan(&percent)
     
-    	for i := range lt {
+    	for i := range lt {        //Need to reduce redunduncy
     		if lt[i].Eid == id {
-    
     			lt[i].Salary += lt[i].Salary * percent / 100
     			dept := lt[i].Dept
     			if dept == "Finance" {
