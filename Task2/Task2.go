@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-type Employees struct {
+type Employees struct { //can be accessed from other packages
 	Eid    int
 	Name   string
 	Age    int
@@ -13,25 +13,26 @@ type Employees struct {
 	Dept   string
 }
 
-type Department struct {
+type Department struct { //public...
 	Dname string
 	List  []Employees
 }
 
-func (d *Department) AddEmp(e Employees) {
+func (d *Department) AddEmp(e Employees) { //public..
 	d.List = append(d.List, e)
 }
 
-func (d *Department) RemoveEmp(id int) { 
+func (d *Department) RemoveEmp(id int) bool { //public
 	for i, emp := range d.List {
 		if emp.Eid == id {
-			d.List = append(d.List[:i], d.List[i+1:]...)
-			return
+			d.List = append(d.List[:i], d.List[i+1:]...) //(variadic expression) take ele one by one from slice   [without ... go thinks we append 1 ele not all]
+			return true
 		}
 	}
+	return false
 }
 
-func (d Department) AvgSal() float64 {
+func (d Department) AvgSal() float64 { //public
 	if len(d.List) == 0 {
 		return 0
 	}
@@ -42,22 +43,54 @@ func (d Department) AvgSal() float64 {
 	return sum / float64(len(d.List))
 }
 
-func scan_input(err error) {
+func scan_input(err error) { //private, limited for this package only
 	if err != nil {
 		if err == io.EOF || err == io.ErrUnexpectedEOF {
 			fmt.Println("\nInput finished or unexpected end of input:", err)
 		} else {
-			fmt.Println("Error reading eid:", err)
+			fmt.Println("Input error:", err)
 		}
-		return
-	} else {
-		fmt.Println("\nSuccessfully Read Your Input")
+	}
+}
+
+func empExists(list []Employees, id int) bool { // private (it only checks if emp is there or not, doesnt care about its location, eg:add)
+	for _, e := range list {
+		if e.Eid == id {
+			return true
+		}
+	}
+	return false
+}
+
+func findEmpIndex(list []Employees, id int) int { //private (it cares about position eg: update)
+	for i, e := range list {
+		if e.Eid == id {
+			return i
+		}
+	}
+	return -1
+}
+
+func getDeptPtr(dept string, finance, marketing, it *Department) *Department { //private (to avoid repetitive if-else block)
+	if dept == "Finance" {
+		return finance
+	} else if dept == "Marketing" {
+		return marketing
+	}
+	return it //as it uses ptr it modifies the original value
+}
+
+func updateDeptSalary(d *Department, id int, sal float64) { //private
+	for i := range d.List {
+		if d.List[i].Eid == id {
+			d.List[i].Salary = sal
+			return
+		}
 	}
 }
 
 func main() {
 	var lt []Employees
-
 	var err error
 
 	finance := Department{Dname: "Finance"}
@@ -66,118 +99,106 @@ func main() {
 
 	for {
 		fmt.Println("\nMENU\n1. Add Employees\n2. Delete Employee\n3. Update Employe\n4. Display All\n5. Raise Salary\n6. Exit")
+		fmt.Print("\nEnter choice: ")
 
-		fmt.Println("\nEnter choice: ")
 		var ch int
 		fmt.Scan(&ch)
 
 		switch ch {
-		case 1: //Need to implement for repeated id
+
+		case 1:
 			var n int
-			fmt.Println("\nEnter number of employees to add: ")
+			fmt.Print("\nEnter number of employees to add: ")
 			fmt.Scan(&n)
 
 			for i := 0; i < n; i++ {
 				var e Employees
 
 				fmt.Print("\nEnter Eid: ")
-				_, err := fmt.Scan(&e.Eid)
-				scan_input(err)
+				fmt.Scan(&e.Eid)
+				if empExists(lt, e.Eid) {
+					fmt.Println("Error: Employee ID already exists!")
+					continue
+				}
 
-				fmt.Print("\nEnter Name: ")
+				fmt.Print("Enter Name: ")
 				_, err = fmt.Scan(&e.Name)
 				scan_input(err)
 
-				fmt.Print("\nEnter Age: ")
+				fmt.Print("Enter Age: ")
 				_, err = fmt.Scan(&e.Age)
 				scan_input(err)
 
-				fmt.Print("\nEnter Salary: ")
+				fmt.Print("Enter Salary: ")
 				_, err = fmt.Scan(&e.Salary)
 				scan_input(err)
 
-				fmt.Print("\nEnter Department: ")
+				fmt.Print("Enter Department: ")
 				_, err = fmt.Scan(&e.Dept)
 				scan_input(err)
 
 				lt = append(lt, e)
-
-				if e.Dept == "Finance" {
-					finance.AddEmp(e)
-				} else if e.Dept == "Marketing" {
-					marketing.AddEmp(e)
-				} else {
-					it.AddEmp(e)
-				}
+				getDeptPtr(e.Dept, &finance, &marketing, &it).AddEmp(e)
+				fmt.Println("Employee Added Successfully")
 			}
-			
+
 		case 2:
 			var id int
 			fmt.Print("\nEnter Employee ID to delete: ")
 			fmt.Scan(&id)
 
-			finance.RemoveEmp(id)
-			marketing.RemoveEmp(id)
-			it.RemoveEmp(id)
+			if !empExists(lt, id) {
+				fmt.Println("Error: Employee not found!")
+				break
+			}
 
-		case 3: // Need to implement for non-existent id and repeated id
+			idx := findEmpIndex(lt, id)
+			dept := lt[idx].Dept
+			lt = append(lt[:idx], lt[idx+1:]...)
+			getDeptPtr(dept, &finance, &marketing, &it).RemoveEmp(id)
+			fmt.Println("Employee Deleted Successfully")
+
+		case 3:
 			var id int
-			fmt.Print("\nEnter Employee ID to update: ")
+			fmt.Print("\nEnter Employee ID to Update: ")
 			fmt.Scan(&id)
 
-			for i := range lt {
-				if lt[i].Eid == id {
-					oldDept := lt[i].Dept
-
-					fmt.Print("Enter New Name: ")
-					_, err = fmt.Scan(&lt[i].Name)
-					scan_input(err)
-
-					fmt.Print("Enter New Age: ")
-					_, err = fmt.Scan(&lt[i].Age)
-					scan_input(err)
-
-
-					fmt.Print("Enter New Salary: ")
-					_, err = fmt.Scan(&lt[i].Salary)
-					scan_input(err)
-
-
-					fmt.Print("Enter New Department: ")
-					_, err = fmt.Scan(&lt[i].Dept)
-					scan_input(err)
-
-
-					if oldDept == "Finance" {
-						finance.RemoveEmp(id)
-					} else if oldDept == "Marketing" {
-						marketing.RemoveEmp(id)
-					} else {
-						it.RemoveEmp(id)
-					}
-
-					if lt[i].Dept == "Finance" {
-						finance.AddEmp(lt[i])
-					} else if lt[i].Dept == "Marketing" {
-						marketing.AddEmp(lt[i])
-					} else {
-						it.AddEmp(lt[i])
-					}
-
-					fmt.Println("Updated Successfully")
-					break
-				}
+			idx := findEmpIndex(lt, id)
+			if idx == -1 {
+				fmt.Println("Error: Employee not found!")
+				break
 			}
+
+			oldDept := lt[idx].Dept
+
+			fmt.Print("Enter New Name: ")
+			fmt.Scan(&lt[idx].Name)
+
+			fmt.Print("Enter New Age: ")
+			fmt.Scan(&lt[idx].Age)
+
+			fmt.Print("Enter New Salary: ")
+			fmt.Scan(&lt[idx].Salary)
+
+			fmt.Print("Enter New Department: ")
+			fmt.Scan(&lt[idx].Dept)
+
+			getDeptPtr(oldDept, &finance, &marketing, &it).RemoveEmp(id)
+			getDeptPtr(lt[idx].Dept, &finance, &marketing, &it).AddEmp(lt[idx])
+
+			fmt.Println("Updated Successfully")
 
 		case 4:
-			fmt.Println("\nALL EMPLOYEES")
-			for _, e := range lt {
-				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s", e.Eid, e.Name, e.Age, e.Salary, e.Dept)
+			if len(lt) == 0 {
+				fmt.Println("No Employees to Display")
+				break
 			}
 
-			fmt.Println("\n\nFinance:", finance.List)
-			fmt.Println("Marketing:", marketing.List)
-			fmt.Println("IT:", it.List)
+			fmt.Println("\nALL EMPLOYEES")
+			for _, e := range lt {
+				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s",
+					e.Eid, e.Name, e.Age, e.Salary, e.Dept)
+			}
 
 		case 5:
 			var id int
@@ -186,36 +207,23 @@ func main() {
 			fmt.Print("Enter Employee ID: ")
 			fmt.Scan(&id)
 
+			idx := findEmpIndex(lt, id)
+			if idx == -1 {
+				fmt.Println("Error: Employee Not Found!")
+				break
+			}
+
 			fmt.Print("Enter Raise Percentage: ")
 			fmt.Scan(&percent)
 
-			for i := range lt { //Need to reduce redunduncy
-				if lt[i].Eid == id {
-					lt[i].Salary += lt[i].Salary * percent / 100
-					dept := lt[i].Dept
-					if dept == "Finance" {
-						for j := range finance.List {
-							if finance.List[j].Eid == id {
-								finance.List[j].Salary = lt[i].Salary
-							}
-						}
-					} else if dept == "Marketing" {
-						for j := range marketing.List {
-							if marketing.List[j].Eid == id {
-								marketing.List[j].Salary = lt[i].Salary
-							}
-						}
-					} else {
-						for j := range it.List {
-							if it.List[j].Eid == id {
-								it.List[j].Salary = lt[i].Salary
-							}
-						}
-					}
-					fmt.Println("Salary Raised!")
-					break
-				}
-			}
+			lt[idx].Salary += lt[idx].Salary * percent / 100
+			updateDeptSalary(
+				getDeptPtr(lt[idx].Dept, &finance, &marketing, &it),
+				id,
+				lt[idx].Salary,
+			)
+
+			fmt.Println("Salary Raised Successfully")
 
 		case 6:
 			fmt.Println("\nDepartment Averages:")
@@ -224,6 +232,7 @@ func main() {
 			fmt.Printf("IT: %.2f\n", it.AvgSal())
 			fmt.Println("Exiting Program...")
 			return
+
 		default:
 			fmt.Println("Invalid choice")
 		}
