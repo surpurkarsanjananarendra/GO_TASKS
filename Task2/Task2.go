@@ -1,7 +1,9 @@
 package main
 
-import ("fmt"
-		"io")
+import (
+	"fmt"
+	"io"
+)
 
 type Employees struct {
 	Eid    int
@@ -20,7 +22,7 @@ func (d *Department) AddEmp(e Employees) {
 	d.List = append(d.List, e)
 }
 
-func (d *Department) RemoveEmp(id int) {   //Need to implement using Delete or Remove functs
+func (d *Department) RemoveEmp(id int) { 
 	for i, emp := range d.List {
 		if emp.Eid == id {
 			d.List = append(d.List[:i], d.List[i+1:]...)
@@ -40,8 +42,23 @@ func (d Department) AvgSal() float64 {
 	return sum / float64(len(d.List))
 }
 
+func scan_input(err error) {
+	if err != nil {
+		if err == io.EOF || err == io.ErrUnexpectedEOF {
+			fmt.Println("\nInput finished or unexpected end of input:", err)
+		} else {
+			fmt.Println("Error reading eid:", err)
+		}
+		return
+	} else {
+		fmt.Println("\nSuccessfully Read Your Input")
+	}
+}
+
 func main() {
 	var lt []Employees
+
+	var err error
 
 	finance := Department{Dname: "Finance"}
 	marketing := Department{Dname: "Marketing"}
@@ -50,82 +67,38 @@ func main() {
 	for {
 		fmt.Println("\nMENU\n1. Add Employees\n2. Delete Employee\n3. Update Employe\n4. Display All\n5. Raise Salary\n6. Exit")
 
-		fmt.Print("Enter choice: ")
+		fmt.Println("\nEnter choice: ")
 		var ch int
 		fmt.Scan(&ch)
 
 		switch ch {
-		case 1:              //Need to implement for repeated id
+		case 1: //Need to implement for repeated id
 			var n int
-			fmt.Print("Enter number of employees to add: ")
+			fmt.Println("\nEnter number of employees to add: ")
 			fmt.Scan(&n)
 
-			for i := 0; i < n; i++ {  //Need to implement a singlr func to work for all scanlns
+			for i := 0; i < n; i++ {
 				var e Employees
 
 				fmt.Print("\nEnter Eid: ")
 				_, err := fmt.Scan(&e.Eid)
-				if err != nil {
-				if err == io.EOF || err == io.ErrUnexpectedEOF {
-				fmt.Println("Input finished or unexpected end of input:", err)
-				} else {
-				fmt.Println("Error reading eid:", err)
-				}
-				}else{
-				fmt.Println("Successfully read Eid:", e.Eid)
-				}
+				scan_input(err)
 
-				fmt.Print("Enter Name: ")
+				fmt.Print("\nEnter Name: ")
 				_, err = fmt.Scan(&e.Name)
-				if err != nil {
-					if err == io.EOF || err == io.ErrUnexpectedEOF {
-						fmt.Println("\nInput finished:", err)
-						return
-					}
-					fmt.Println("Error reading name:", err)
-					return
-				}else{
-				fmt.Println("Successfully read Name:", e.Name)
-				}
+				scan_input(err)
 
-				fmt.Print("Enter Age: ")
+				fmt.Print("\nEnter Age: ")
 				_, err = fmt.Scan(&e.Age)
-				if err != nil {
-					if err == io.EOF || err == io.ErrUnexpectedEOF {
-						fmt.Println("\nInput finished:", err)
-						return
-					}
-					fmt.Println("Error reading Age:", err)
-					return
-				}else{
-				fmt.Println("Successfully read Age:", e.Age)
-				}
+				scan_input(err)
 
-				fmt.Print("Enter Salary: ")
+				fmt.Print("\nEnter Salary: ")
 				_, err = fmt.Scan(&e.Salary)
-				if err != nil {
-					if err == io.EOF || err == io.ErrUnexpectedEOF {
-						fmt.Println("\nInput finished:", err)
-						return
-					}
-					fmt.Println("Error reading Salary:", err)
-					return
-				}else{
-				fmt.Println("Successfully read Salary:", e.Salary)
-				}
+				scan_input(err)
 
-				fmt.Print("Enter Department: ")
+				fmt.Print("\nEnter Department: ")
 				_, err = fmt.Scan(&e.Dept)
-				if err != nil {
-					if err == io.EOF || err == io.ErrUnexpectedEOF {
-						fmt.Println("\nInput finished:", err)
-						return
-					}
-					fmt.Println("Error reading Dept:", err)
-					return
-				}else{
-				fmt.Println("Successfully read Dept:", e.Dept)
-				}
+				scan_input(err)
 
 				lt = append(lt, e)
 
@@ -137,102 +110,113 @@ func main() {
 					it.AddEmp(e)
 				}
 			}
+			
 		case 2:
 			var id int
-			fmt.Print("Enter Employee ID to delete: ")
+			fmt.Print("\nEnter Employee ID to delete: ")
 			fmt.Scan(&id)
 
 			finance.RemoveEmp(id)
 			marketing.RemoveEmp(id)
 			it.RemoveEmp(id)
 
-		case 3:        // Need to implement for non-existent id and repeated id
-    	var id int
-    	fmt.Print("Enter Employee ID to update: ")
-    	fmt.Scan(&id)
-    
-    	for i := range lt {
-    		if lt[i].Eid == id {
-    			oldDept := lt[i].Dept
-    
-    			fmt.Print("Enter New Name: ")
-    			fmt.Scan(&lt[i].Name)
-    
-    			fmt.Print("Enter New Age: ")
-    			fmt.Scan(&lt[i].Age)
-    
-    			fmt.Print("Enter New Salary: ")
-    			fmt.Scan(&lt[i].Salary)
-    
-    			fmt.Print("Enter New Department: ")
-    			fmt.Scan(&lt[i].Dept)
-    
-    			if oldDept == "Finance" {
-    				finance.RemoveEmp(id)
-    			} else if oldDept == "Marketing" {
-    				marketing.RemoveEmp(id)
-    			} else {
-    				it.RemoveEmp(id)
-    			}
-				
-    			if lt[i].Dept == "Finance" {
-    				finance.AddEmp(lt[i])
-    			} else if lt[i].Dept == "Marketing" {
-    				marketing.AddEmp(lt[i])
-    			} else {
-    				it.AddEmp(lt[i])
-    			}
-    
-    			fmt.Println("Updated Successfully")
-    			break
-    		}
-    	}
+		case 3: // Need to implement for non-existent id and repeated id
+			var id int
+			fmt.Print("\nEnter Employee ID to update: ")
+			fmt.Scan(&id)
+
+			for i := range lt {
+				if lt[i].Eid == id {
+					oldDept := lt[i].Dept
+
+					fmt.Print("Enter New Name: ")
+					_, err = fmt.Scan(&lt[i].Name)
+					scan_input(err)
+
+					fmt.Print("Enter New Age: ")
+					_, err = fmt.Scan(&lt[i].Age)
+					scan_input(err)
+
+
+					fmt.Print("Enter New Salary: ")
+					_, err = fmt.Scan(&lt[i].Salary)
+					scan_input(err)
+
+
+					fmt.Print("Enter New Department: ")
+					_, err = fmt.Scan(&lt[i].Dept)
+					scan_input(err)
+
+
+					if oldDept == "Finance" {
+						finance.RemoveEmp(id)
+					} else if oldDept == "Marketing" {
+						marketing.RemoveEmp(id)
+					} else {
+						it.RemoveEmp(id)
+					}
+
+					if lt[i].Dept == "Finance" {
+						finance.AddEmp(lt[i])
+					} else if lt[i].Dept == "Marketing" {
+						marketing.AddEmp(lt[i])
+					} else {
+						it.AddEmp(lt[i])
+					}
+
+					fmt.Println("Updated Successfully")
+					break
+				}
+			}
+
 		case 4:
 			fmt.Println("\nALL EMPLOYEES")
 			for _, e := range lt {
-				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s",e.Eid, e.Name, e.Age, e.Salary, e.Dept)
+				fmt.Printf("\nID:%d Name:%s Age:%d Salary:%.2f Dept:%s", e.Eid, e.Name, e.Age, e.Salary, e.Dept)
 			}
 
 			fmt.Println("\n\nFinance:", finance.List)
 			fmt.Println("Marketing:", marketing.List)
 			fmt.Println("IT:", it.List)
-    	case 5:
-    	var id int
-    	var percent float64
-    
-    	fmt.Print("Enter Employee ID: ")
-    	fmt.Scan(&id)
-    
-    	fmt.Print("Enter Raise Percentage: ")
-    	fmt.Scan(&percent)
-    
-    	for i := range lt {        //Need to reduce redunduncy
-    		if lt[i].Eid == id {
-    			lt[i].Salary += lt[i].Salary * percent / 100
-    			dept := lt[i].Dept
-    			if dept == "Finance" {
-    				for j := range finance.List {
-    					if finance.List[j].Eid == id {
-    						finance.List[j].Salary = lt[i].Salary
-    					}
-    				}
-    			} else if dept == "Marketing" {
-    				for j := range marketing.List {
-    					if marketing.List[j].Eid == id {
-    						marketing.List[j].Salary = lt[i].Salary
-    					}
-    				}
-    			} else {
-    				for j := range it.List {
-    					if it.List[j].Eid == id {
-    						it.List[j].Salary = lt[i].Salary
-    					}
-    				}
-    			}
-    			fmt.Println("Salary Raised!")
-    			break
-    		}
-    	}
+
+		case 5:
+			var id int
+			var percent float64
+
+			fmt.Print("Enter Employee ID: ")
+			fmt.Scan(&id)
+
+			fmt.Print("Enter Raise Percentage: ")
+			fmt.Scan(&percent)
+
+			for i := range lt { //Need to reduce redunduncy
+				if lt[i].Eid == id {
+					lt[i].Salary += lt[i].Salary * percent / 100
+					dept := lt[i].Dept
+					if dept == "Finance" {
+						for j := range finance.List {
+							if finance.List[j].Eid == id {
+								finance.List[j].Salary = lt[i].Salary
+							}
+						}
+					} else if dept == "Marketing" {
+						for j := range marketing.List {
+							if marketing.List[j].Eid == id {
+								marketing.List[j].Salary = lt[i].Salary
+							}
+						}
+					} else {
+						for j := range it.List {
+							if it.List[j].Eid == id {
+								it.List[j].Salary = lt[i].Salary
+							}
+						}
+					}
+					fmt.Println("Salary Raised!")
+					break
+				}
+			}
+
 		case 6:
 			fmt.Println("\nDepartment Averages:")
 			fmt.Printf("Finance: %.2f\n", finance.AvgSal())

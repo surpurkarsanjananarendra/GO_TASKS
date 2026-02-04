@@ -15,7 +15,7 @@ func squareWorkers(numbers chan int, squares chan int, wg *sync.WaitGroup) {
 	close(squares)
 }
 
-func printAggrigate(squares chan int) {
+func printAggregate(squares chan int) {
 	total := 0
 	fmt.Println("\n\nSquares of numbers: ")
 	for i := range squares {
@@ -53,7 +53,7 @@ func main() {
 	wg.Add(1)
 	go squareWorkers(numbers, squares, &wg)
 
-	printAggrigate(squares)
+	printAggregate(squares)
 
 	wg.Wait()
 }
