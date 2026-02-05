@@ -44,10 +44,13 @@ func main() {
 		go squareWorker(val, squares, &wg)
 	}
 
-	go func() {
+	/*go func() {
 		wg.Wait()
 		close(squares)
-	}()
+	}()*/
+
+	wg.Wait()
+	close(squares)
 
 	aggregate := <-result
 	fmt.Println("\n\nAggregate of Numbers:", aggregate)
